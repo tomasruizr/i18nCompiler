@@ -80,14 +80,13 @@ function i18nCompiler(options) {
 //**************************************************************************************************
 
 i18nCompiler.prototype.compile = function(src, dest, lang, opts){
-	console.log('Compiling');
 	var self = this;
 	var options = opts ? _.extend(this.options, opts) : this.options;
     var i18n = new CompilerMessageFormat('en');
     var all = true;
     var localesFolderDir = new Array();
     //iterating the folders for each localization           
-    if(typeof lang === 'String'){
+    if(typeof lang === 'string'){
     	localesFolderDir[0] = lang;
     	all=false;
     }else if(typeof lang === 'Array'){
@@ -97,106 +96,68 @@ i18nCompiler.prototype.compile = function(src, dest, lang, opts){
     	localesFolderDir = fs.readdirSync(options.localesFolder);
     	all=true;
     }
-
     // iterate each locale folder
-    //var promiseLocales = new Promise(function(resolve, reject){
+	for (var lc = 0; lc < localesFolderDir.length; lc++) {
+        var lang = localesFolderDir[lc];
+        var destLangFolder = path.join(dest, lang);
+        //Report progress to console.
+        console.log('Compiling language: ' + lang + ' in the folder: ' + destLangFolder);
+        //ensure the folder exists or create it.
+        fs.ensureDirSync(destLangFolder);
+        var replacesCount = 0;
+        var locales = JSON.parse(fs.readFileSync(path.join(options.localesFolder, lang, lang + '.json'), 'utf8'));
+        var fileStr = '';
+        var fileName = '';
+        //For each file in the source.
+        for (var srcCount = src.length - 1; srcCount >= 0; srcCount--) {
+            fileName = src[srcCount];
+            var fileStat = fs.statSync(fileName);
+    		if (fileStat && !fileStat.isDirectory()) {
+                fileStr = fs.readFileSync(fileName, 'utf8');
+                //get the locals in each files
+                var strArray = this.getI18nStrings(path.extname(fileName), fileStr, options);
+                    //For each local in the source.
+                for (var strArrayCont = strArray.length - 1; strArrayCont >= 0; strArrayCont--) {
+                    var rawLocaleArr = strArray[strArrayCont];
+                    //key to search in the json file.
+                    var localeStr = self.purifyLocal(rawLocaleArr[1]);
+                    //Data of the sentence if it exists
+                    var localeData = self.purifyData(rawLocaleArr[1]);
+                    //Ignore if only translating the Marked As Translated Strings and is falase.
+                    if (options.markedOnly && !locales[localeStr].translated){
+                        fileStr = self.replaceAll(fileStr, rawLocaleArr[0], rawLocaleArr[1]);
+                    }
+                    else{
+                        var tValue = options.callbackFunction(locales[localeStr].translation, localeData, path.extname(fileName) == '.js');
+                        replacesCount += self.countReplaces(fileStr, rawLocaleArr[1], tValue);
+                        fileStr = self.replaceAll(fileStr, rawLocaleArr[0], tValue);
+                    }
+                }
+                var dFile = fileName.split('/');
+                if (dFile[0] === '.'){
+                    dFile.splice(0,1);
+                }
+                dFile.splice(0,1);
+                var dFilename = dFile.join(path.sep);
+                fs.ensureDirSync(path.dirname(path.join(destLangFolder, dFilename)));
+                fs.writeFileSync(path.join(destLangFolder, dFilename), fileStr);
+    		}
+        }
+		//Report Totals
+        //Filter only the locals that are translated
+        console.log('Total of translated strings to replace: ' + Object.keys(_.pick(locales, function(value, key){return value.translated;})).length);
+        console.log('Total of ocurrences replaced: ' + replacesCount);
+        // write a custom js for the client in this lang.
+        if (options.plurals && options.plurals[lang]){
+            fs.writeFileSync(path.join(destLangFolder, 'i18n.js'), i18n.functions(options.plurals[lang].fewLimit, options.plurals[lang].manyLimit));
+        }
+        else{
+            fs.writeFileSync(path.join(destLangFolder, 'i18n.js'), i18n.functions(options.defaultPlurals.fewLimit, options.defaultPlurals.manyLimit));
+        }
+        console.log('Writed plural file to: ' + path.join(destLangFolder, 'i18n.js'));	
+    }
+	console.log('Process Complete!!.');
 
-
-    	for (var lc = 0; lc < localesFolderDir.length; lc++) {
-	        var lang = localesFolderDir[lc];
-
-	        var destLangFolder = path.join(dest, lang);
-	        //Report progress to console.
-	        console.log('Compiling language: ' + lang + ' in the folder: ' + destLangFolder);
-	        
-
-	        //ensure the folder exists or create it.
-	        fs.ensureDirSync(destLangFolder);
-
-	        // var stat = fs.statSync(destLangFolder);
-	        // if (stat && stat.isDirectory()) {
-            var replacesCount = 0;
-            var locales = JSON.parse(fs.readFileSync(path.join(options.localesFolder, lang, lang + '.json'), 'utf8'));
-            
-            var fileStr = '';
-            var fileName = '';
-            // var newFile = '';   
-            //For each file in the source.
-            for (var srcCount = src.length - 1; srcCount >= 0; srcCount--) {
-                fileName = src[srcCount];
-                var fileStat = fs.statSync(destLangFolder);
-        		if (fileStat && !fileStat.isDirectory()) {
-        			
-	                fileStr = fs.readFileSync(fileName, 'utf8');
-	                //get the locals in each files
-	                
-	                this.getI18nStrings(path.extname(fileName), fileStr, options, function(strArray){
-	                    //For each local in the source.
-	                    for (var strArrayCont = strArray.length - 1; strArrayCont >= 0; strArrayCont--) {
-	                        var rawLocaleArr = strArray[strArrayCont];
-	                        //key to search in the json file.
-	                        var localeStr = self.purifyLocal(rawLocaleArr[1]);
-	                        //Data of the sentence if it exists
-	                        var localeData = self.purifyData(rawLocaleArr[1]);
-	                        //Ignore if only translating the Marked As Translated Strings and is falase.
-	                        if (options.markedOnly && !locales[localeStr].translated){
-	                            fileStr = self.replaceAll(fileStr, rawLocaleArr[0], rawLocaleArr[1]);
-	                        }
-	                        else{
-	                            var tValue = options.callbackFunction(locales[localeStr].translation, localeData, path.extname(fileName) == '.js');
-	                            fileStr = self.replaceAll(fileStr, rawLocaleArr[0], tValue);
-	                            replacesCount += self.countReplaces(fileStr, rawLocaleArr[1], tValue);
-	                        }
-	                        //translated Value.
-	                        
-	                    }
-		                var dFile = fileName.split('/');
-		                console.log(dFile);
-		                if (dFile[0] === '.'){
-		                    dFile.splice(0,1);
-		                }
-		                dFile.splice(0,1);
-		                var dFilename = dFile.join(path.sep);
-		                // console.log(dFilename);
-		                // console.log(path.join(dFile));
-		                fs.ensureDirSync(path.dirname(path.join(destLangFolder, dFilename)));
-		                fs.writeFileSync(path.join(destLangFolder, dFilename), fileStr);
-	                }).then(function(res){
-	                	console.log('JAJAJAJA');
-	                	console.log('JAJAJAJA');
-	                	console.log('JAJAJAJA');
-	                	console.log('JAJAJAJA');
-	                	console.log('JAJAJAJA');
-	                });
-	                
-        		}
-        	
-                
-            }
-
-            
-			
-			//Report Totals
-            //Filter only the locals that are translated
-                
-            console.log('Total of translated strings to replace: ' + Object.keys(_.pick(locales, function(value, key){return value.translated;})).length);
-            console.log('Total of ocurrences replaced: ' + replacesCount);
-            // write a custom js for the client in this lang.
-            if (options.plurals && options.plurals[lang]){
-                fs.writeFileSync(path.join(destLangFolder, 'i18n.js'), i18n.functions(options.plurals[lang].fewLimit, options.plurals[lang].manyLimit));
-            }
-            else{
-                fs.writeFileSync(path.join(destLangFolder, 'i18n.js'), i18n.functions(options.defaultPlurals.fewLimit, options.defaultPlurals.manyLimit));
-            }
-            console.log('Writed plural file to: ' + path.join(destLangFolder, 'i18n.js'));	
-        //}
-
-
-	    }
-	//});
-	//promiseLocales.then(function(){
-		console.log('Process Complete!!.');
-	//},function(){});
      
 }  
 
@@ -248,29 +209,29 @@ i18nCompiler.prototype.fetch = function(src, opts, cb){
         	}	
 	      	fileStr = fs.readFileSync(fileName, 'utf8');
 	      	//get the locals in each files
-	      	this.getI18nStrings(path.extname(fileName), fileStr, options, function(strArray){
-      			for (var strArrayCont = strArray.length - 1; strArrayCont >= 0; strArrayCont--) {
-		  			var rawLocaleArr = strArray[strArrayCont];
-						var localeStr = self.purifyLocal(rawLocaleArr[1]);
- 					if (!langLocals[localeStr]){
-	      				var l = new Object();
-						l.translation = localeStr;
-	      				l.translated = 0;
-	      				l.deleted = 0;
-	      				langLocals[localeStr] = l;
-	      			}
-	      			else{
-	      				langLocals[localeStr].deleted = 0;	
-	      			}
-	      			//validates if the local does not exist and adds it.
-      				//Add the local to the NOT DELETED locals array, any local not
-      				//in here will be marked as deleted in the json file of the local.
-      				if (NDlangLocals.indexOf(localeStr) == -1){
-      					NDlangLocals.push(localeStr);
-      				}
-	      		}
+	      	var strArray = this.getI18nStrings(path.extname(fileName), fileStr, options);
+  			for (var strArrayCont = strArray.length - 1; strArrayCont >= 0; strArrayCont--) {
+	  			var rawLocaleArr = strArray[strArrayCont];
+					var localeStr = self.purifyLocal(rawLocaleArr[1]);
+					if (!langLocals[localeStr]){
+      				var l = new Object();
+					l.translation = localeStr;
+      				l.translated = 0;
+      				l.deleted = 0;
+      				langLocals[localeStr] = l;
+      			}
+      			else{
+      				langLocals[localeStr].deleted = 0;	
+      			}
+      			//validates if the local does not exist and adds it.
+  				//Add the local to the NOT DELETED locals array, any local not
+  				//in here will be marked as deleted in the json file of the local.
+  				if (NDlangLocals.indexOf(localeStr) == -1){
+  					NDlangLocals.push(localeStr);
+  				}
+      		}
 	      	
-			});
+			
 	    }
 	    //Mark all the locales not found in the src files as deleted in the dst json file.
 	    langLocals = this.markDeletedLocales(langLocals, NDlangLocals);
@@ -299,7 +260,7 @@ i18nCompiler.prototype.fetch = function(src, opts, cb){
  *
  * @return {[type]}                [description]
  */
-i18nCompiler.prototype.getI18nStrings = function(fileExt, fileStr, options, callback){
+i18nCompiler.prototype.getI18nStrings = function(fileExt, fileStr, options){
 	if (fileExt === '.js') {
 		//	__\s*\(([^\)]*)\)
 		var reStr = options.localizationFunction + '\\s*\\(([^\\)]*)\\)';
@@ -310,7 +271,7 @@ i18nCompiler.prototype.getI18nStrings = function(fileExt, fileStr, options, call
 		options.localizationFunction + "\\s*\\((.*)\\)" +
 		options.closeLocalizationTag;
 	}
-	callback(this.searchRegExp(reStr, fileStr));
+	return this.searchRegExp(reStr, fileStr);
 }
 
 /**
