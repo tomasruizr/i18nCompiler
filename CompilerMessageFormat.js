@@ -1,5 +1,5 @@
 /**
- * i18nCompiler.js
+ * CompilerMessageFormat.js
  *
  * ICU PluralFormat + SelectFormat for JavaScript
  *
@@ -21,7 +21,6 @@
  *
  * @author Tomás Ruiz - @tomasruizr, tomasruizr@gmail.com
  * @version 0.1.0
- * @contributor_license Dojo CLA
  */
 
 (function ( root ) {
@@ -29,15 +28,15 @@
   //Inheritance from Message Format
   //************************************************
   var MessageFormat = require('messageformat');
-  function i18nCompiler() {
+  function CompilerMessageFormat() {
     MessageFormat.apply(this, Array.prototype.slice.call(arguments));
   };
-  i18nCompiler.prototype = new MessageFormat('en');
+  CompilerMessageFormat.prototype = new MessageFormat('en');
 
   //************************************************
   //Functino override
   //************************************************
-  i18nCompiler.prototype.functions = function (fewLimit, manyLimit) {
+  CompilerMessageFormat.prototype.functions = function (fewLimit, manyLimit) {
     fewLimit = fewLimit|| 10;
     manyLimit = manyLimit || 20;
     var str = 
@@ -89,14 +88,14 @@
     return str;
   };
 
-  i18nCompiler.prototype.compile = function ( message ) {
+  CompilerMessageFormat.prototype.compile = function ( message ) {
     return (new Function(
       this.functions() +
       'return ' + this.precompile( this.parse( message ))
     ))();
   };
   
-  i18nCompiler.prototype.precompile = function(ast, datos) {
+  CompilerMessageFormat.prototype.precompile = function(ast, datos) {
     var self = this,
         needOther = false;
 
@@ -210,17 +209,17 @@
   //************************************************
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
-      exports = module.exports = i18nCompiler;
+      exports = module.exports = CompilerMessageFormat;
     }
-    exports.i18nCompiler = i18nCompiler;
+    exports.CompilerMessageFormat = CompilerMessageFormat;
   }
   else if (typeof define === 'function' && define.amd) {
     define(function() {
-      return i18nCompiler;
+      return CompilerMessageFormat;
     });
   }
   else {
-    root['i18nCompiler'] = i18nCompiler;
+    root['CompilerMessageFormat'] = CompilerMessageFormat;
   }
 
 })( this );

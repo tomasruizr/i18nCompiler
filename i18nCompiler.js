@@ -161,7 +161,7 @@ i18nCompiler.prototype.compile = function(src, dest, lang, opts){
      
 }  
 
-i18nCompiler.prototype.fetch = function(src, opts, cb){
+i18nCompiler.prototype.fetch = function(src, opts){
 	console.log('Fetching');
 	var self = this;
 
@@ -178,8 +178,6 @@ i18nCompiler.prototype.fetch = function(src, opts, cb){
 	 * @type {Array}
 	 */
 	var NDlangLocals= new Array();
-
-  	console.log(src);
 
 	for (var i = options.languages.length - 1; i >= 0; i--) {
 		var lang = options.languages[i];
@@ -202,7 +200,6 @@ i18nCompiler.prototype.fetch = function(src, opts, cb){
   		var fileName = '';
   		for (var srcCount = src.length - 1; srcCount >= 0; srcCount--) {
   			fileName = src[srcCount];
-  			console.log(fileName);
   			var stat = fs.statSync(fileName);
         	if (stat && stat.isDirectory()){
         		continue;
