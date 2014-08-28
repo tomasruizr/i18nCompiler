@@ -115,6 +115,9 @@ i18nCompiler.prototype.compile = function(src, dest, lang, opts){
     // iterate each locale folder
 	for (var lc = 0; lc < localesFolderDir.length; lc++) {
         var lang = localesFolderDir[lc];
+        if (!(fs.statSync(fileName).isDirectory())){
+        	continue;
+        }
         var destLangFolder = path.join(dest, lang);
         //Report progress to console.
         console.log('Compiling language: ' + lang + ' in the folder: ' + destLangFolder);
