@@ -19,7 +19,8 @@ var CompilerMessageFormat = require('./CompilerMessageFormat.js');
 //*******************************************
 
 /**
-* [i18nCompiler description]
+* Generates a compiled version of an Application for each Locale supported.
+*
 *
 * @class i18nCompiler
 * 
@@ -43,20 +44,20 @@ function i18nCompiler(options) {
 	 	},
 	    languages : [],
 	    /**
-	     * Default Callback function to call specifying what to do to
-	     *         process the localization. it can be overrided in the
-	     *         options of the gruntFile.
+	     * Default Callback function to call specifying what to do to process
+	     *         the localization. it can be overrided in the options passed
+	     *         as parameters in the compile and fetch function.
 	     *
 	     * @method callbackFunction
 	     *
 	     * @param  {string}         str   the string to be localized
 	     * @param  {object}         data  the object representing the data
-	     *         that's going to be passed as parameters to the
-	     *         localization function in the client side.
+	     *         that's going to be passed as parameters to the localization
+	     *         function in the client side.
 	     * @param  {bool}         quote whether to quote the values or not.
 	     *
-	     * @return {string}               The string to be puted in place of
-	     *         the localization string.
+	     * @return {string}               The string to be puted in place of the
+	     *         localization string.
 	     */
 	     callbackFunction : function(str, data, quote) {
 	     	quote = quote | false;
@@ -78,7 +79,22 @@ function i18nCompiler(options) {
 //**************************************************************************************************
 // MAIN FUNCTIONS
 //**************************************************************************************************
-
+/**
+ * Compiles the the folder struncture in the source folder with the locals in
+ *         each language in the locals folder. Generates the same file structure
+ *         in the source folder for each language in the dest folder.
+ *
+ * @method compile
+ *
+ * @param  {Array} src  List of files to be processed. Ussualy is the resulting
+ *         array of a glob search pattern. See
+ *         https://github.com/isaacs/node-glob
+ * @param  {strnig} dest Folder for the destination compilation.
+ * @param  {string|Array|null} lang The language or languages to be compiled,
+ *         null will compile them All as well as if the string '_all_' is
+ *         passed.
+ * @param  {Object} opts Override for the options of the compiler.
+ */
 i18nCompiler.prototype.compile = function(src, dest, lang, opts){
 	var self = this;
 	var options = opts ? _.extend(this.options, opts) : this.options;
@@ -157,10 +173,19 @@ i18nCompiler.prototype.compile = function(src, dest, lang, opts){
         console.log('Writed plural file to: ' + path.join(destLangFolder, 'i18n.js'));	
     }
 	console.log('Process Complete!!.');
-
-     
 }  
-
+/**
+ * Search for all the localization strings in the source folder and generates a json file with the locals to be translated for each language supported.
+ *
+ * @method fetch
+ *
+ * @param  {Array} src  List of files to be processed. Ussualy is the resulting
+ *         array of a glob search pattern. See
+ *         https://github.com/isaacs/node-glob
+ * @param  {Object} opts Override for the options of the compiler.
+ *
+ * @return {[type]}      [description]
+ */
 i18nCompiler.prototype.fetch = function(src, opts){
 	console.log('Fetching');
 	var self = this;
@@ -239,7 +264,6 @@ i18nCompiler.prototype.fetch = function(src, opts){
 	    console.log('Strings to Translate found: ' + NDlangLocals.length);
 	    console.log('Strings to Translate marked to be deleted: ' + (count - NDlangLocals.length));
 	};
-	
 }
 
 //*******************************************
@@ -250,12 +274,11 @@ i18nCompiler.prototype.fetch = function(src, opts){
  *
  * @method getI18nStrings
  *
- * @param  {[type]}       fileExt  [description]
- * @param  {[type]}       fileStr  [description]
- * @param  {[type]}       options  [description]
- * @param  {Function}     callback [description]
- *
- * @return {[type]}                [description]
+ * @param  {string}       fileExt  The file extention of the source file beeing processed. Depending on it the proccess varies.
+ * @param  {string}       fileStr  The content of the file itself.
+ * @param  {Object}       options  The i18nCompiler Options to use.
+ *                                 	
+ * @return {Array}                Returns the localization strings found in the file.
  */
 i18nCompiler.prototype.getI18nStrings = function(fileExt, fileStr, options){
 	if (fileExt === '.js') {
@@ -276,12 +299,11 @@ i18nCompiler.prototype.getI18nStrings = function(fileExt, fileStr, options){
  *
  * @method purifyLocal
  *
- * @param  {[type]}    rawLocal [description]
- * @param  {Function}  callback [description]
+ * @param  {string}    rawLocal [description]
  *
  * @return {[type]}             [description]
  */
-i18nCompiler.prototype.purifyLocal = function(rawLocal, callback){
+i18nCompiler.prototype.purifyLocal = function(rawLocal){
 	var locales = [];
 	//(?!'|\")(.*)(?=['|\"](?=[,]|$))
 	var reStr= '(?!\'|\\")(.*)(?=[\'|\\"](?=[,]|$))';
@@ -333,7 +355,16 @@ i18nCompiler.prototype.searchRegExp = function(reStr, str){
 	} while (regex);
 	return result;
 };
-
+/**
+ * [markDeletedLocales description]
+ *
+ * @method markDeletedLocales
+ *
+ * @param  {[type]}           locals   [description]
+ * @param  {[type]}           ndLocals [description]
+ *
+ * @return {[type]}                    [description]
+ */
 i18nCompiler.prototype.markDeletedLocales = function(locals, ndLocals){
 	for (var l in locals)
 	{
@@ -344,10 +375,29 @@ i18nCompiler.prototype.markDeletedLocales = function(locals, ndLocals){
 	}
 	return locals;
 };
-
+/**
+ * [escapeRegExp description]
+ *
+ * @method escapeRegExp
+ *
+ * @param  {[type]}     string [description]
+ *
+ * @return {[type]}            [description]
+ */
 i18nCompiler.prototype.escapeRegExp = function (string) {
 	return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
+/**
+ * [countReplaces description]
+ *
+ * @method countReplaces
+ *
+ * @param  {[type]}      string  [description]
+ * @param  {[type]}      find    [description]
+ * @param  {[type]}      replace [description]
+ *
+ * @return {[type]}              [description]
+ */
 i18nCompiler.prototype.countReplaces = function(string, find, replace){
 	var res = string.match(new RegExp(this.escapeRegExp(find), 'g'));
 	if (res) {
@@ -357,6 +407,17 @@ i18nCompiler.prototype.countReplaces = function(string, find, replace){
 		return 0;
 	}
 }
+/**
+ * [replaceAll description]
+ *
+ * @method replaceAll
+ *
+ * @param  {[type]}   string  [description]
+ * @param  {[type]}   find    [description]
+ * @param  {[type]}   replace [description]
+ *
+ * @return {[type]}           [description]
+ */
 i18nCompiler.prototype.replaceAll = function (string, find, replace) {
 	return string.replace(new RegExp(this.escapeRegExp(find), 'g'), replace);
 }
