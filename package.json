@@ -30,9 +30,8 @@
   },
   "dependencies": {
     "lodash": "^2.4.1",
-    "promise": "^5.0.0",
     "fs-extra": "^0.11.0",
     "messageformat": "^0.2.0",
-    "glob": "^4.0.5"
+    "globule": "^0.2.0"
   }
 }

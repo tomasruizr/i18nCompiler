@@ -10,9 +10,7 @@
 var _ = require('lodash');
 var fs = require('fs-extra');
 var path = require('path');
-var path = require('path');
-var glob = require("glob");
-var Promise = require('promise');
+var glob = require("globule");
 var CompilerMessageFormat = require('./CompilerMessageFormat.js');
 //*******************************************
 // Constructor & Properties
