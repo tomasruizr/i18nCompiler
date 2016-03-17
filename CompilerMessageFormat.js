@@ -34,7 +34,7 @@
   CompilerMessageFormat.prototype = new MessageFormat('en');
 
   //************************************************
-  //Functino override
+  //Function override
   //************************************************
   CompilerMessageFormat.prototype.functions = function (fewLimit, manyLimit) {
     fewLimit = fewLimit|| 10;
@@ -87,13 +87,6 @@
     
     return str;
   };
-
-  CompilerMessageFormat.prototype.compile = function ( message ) {
-    return (new Function(
-      this.functions() +
-      'return ' + this.precompile( this.parse( message ))
-    ))();
-  };
   
   CompilerMessageFormat.prototype.precompile = function(ast, datos) {
     var self = this,
@@ -141,7 +134,7 @@
             data.offset[data.pf_count || 0] = ast.val.offset || 0;
             //****************************
             //Modified by Tomás Ruiz <tomsaruizr@gmail.com> in order to avoid sending the current language to the client
-            //since it is loaded directly from the server and is the only language in the client side by the tieme of execution.
+            //since it is loaded directly from the server and is the only language in the client side by the time of execution.
             //Original:
             // return self.globalName + '.p(d,' + data.keys[data.pf_count] + ',' + (data.offset[data.pf_count] || 0)
             //   + ',"' + self.lc + '",' + interpMFP( ast.val, data ) + ')';
@@ -200,6 +193,26 @@
       }
     }
     return interpMFP( ast );
+  };
+  /**
+   * [compile description]
+   *
+   * @method compile
+   *
+   * @param  {[type]} message [description]
+   *
+   * @return {[type]}         [description]
+   */
+  // Original:
+  // return (new Function(
+  //   'this[\'' + this.globalName + '\']=' + this.functions() + ';' +
+  //   'return ' + this.precompile( this.parse( message ))
+  // ))();
+  CompilerMessageFormat.prototype.compile = function ( message ) {
+    return (new Function(
+      this.functions() +
+      'return ' + this.precompile( this.parse( message ))
+    ))();
   };
 
   //************************************************

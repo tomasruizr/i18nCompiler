@@ -26,12 +26,11 @@
     "url": "https://github.com/tomasruizr/i18nCompiler/issues"
   },
   "homepage": "https://github.com/tomasruizr/i18nCompiler",
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
-    "lodash": "^2.4.1",
-    "fs-extra": "^0.11.0",
-    "messageformat": "^0.2.0",
-    "globule": "^0.2.0"
+    "fs-extra": "^0.26.7",
+    "globule": "^0.2.0",
+    "lodash": "^4.6.1",
+    "messageformat": "^0.2.0"
   }
 }

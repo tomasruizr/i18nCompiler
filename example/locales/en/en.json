@@ -5,8 +5,8 @@
         "deleted": 0
     },
     "this is a subdir tomas": {
-        "translation": "ES UN SUB",
-        "translated": 1,
+        "translation": "this is a subdir tomas",
+        "translated": 0,
         "deleted": 0
     },
     "this is a subdir tomas {NUM}": {
@@ -15,8 +15,8 @@
         "deleted": 0
     },
     "this is a sentence to be translated in the html file 5": {
-        "translation": "Este es el 5",
-        "translated": 1,
+        "translation": "this is a sentence to be translated in the html file 5",
+        "translated": 0,
         "deleted": 0
     },
     "this is a sentence to be translated in the html file 4": {
