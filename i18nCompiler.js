@@ -147,14 +147,9 @@ i18nCompiler.prototype.compile = function (src, dest, lang, opts) {
 							fileStr = self.replaceAll(fileStr, rawLocaleArr[0], tValue);
 						}
 					}
-					var dFile = fileName.split('/');
-					if (dFile[0] === '.') {
-						dFile.splice(0, 1);
-					}
-					dFile.splice(0, 1);
-					var dFilename = dFile.join(path.sep);
-					fs.ensureDirSync(path.dirname(path.join(destLangFolder, dFilename)));
-					fs.writeFileSync(path.join(destLangFolder, dFilename), fileStr);
+					var dFilename = fileName.replace(src[0] + path.sep, '');
+          fs.ensureDirSync(path.dirname(path.join(destLangFolder, dFilename)));
+          fs.writeFileSync(path.join(destLangFolder, dFilename), fileStr);
 				}
 			}
 			//Report Totals
