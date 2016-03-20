@@ -1,0 +1,47 @@
+{
+    "Your {NUM} {NUM, plural, one{message} other{messages}} go here.": {
+        "translation": "Your {NUM} {NUM, plural, one{message} other{messages}} go here.",
+        "translated": 0,
+        "deleted": 0
+    },
+    "this is going to be the translated string:": {
+        "translation": "this is going to be the translated string:",
+        "translated": 0,
+        "deleted": 0
+    },
+    "this is a subdir tomas": {
+        "translation": "this is a subdir tomas",
+        "translated": 0,
+        "deleted": 0
+    },
+    "this is a subdir tomas {NUM}": {
+        "translation": "this is a subdir tomas {NUM}",
+        "translated": 0,
+        "deleted": 0
+    },
+    "this is a sentence to be translated in the html file 5": {
+        "translation": "this is a sentence to be translated in the html file 5",
+        "translated": 0,
+        "deleted": 0
+    },
+    "this is a sentence to be translated in the html file 4": {
+        "translation": "this is a sentence to be translated in the html file 4",
+        "translated": 0,
+        "deleted": 0
+    },
+    "this is a sentence to be translated in the html file 3": {
+        "translation": "this is a sentence to be translated in the html file 3",
+        "translated": 0,
+        "deleted": 0
+    },
+    "this is a sentence to be translated in the html file 2": {
+        "translation": "this is a sentence to be translated in the html file 2",
+        "translated": 0,
+        "deleted": 0
+    },
+    "this is a sentence to be translated in the html file 6": {
+        "translation": "this is a sentence to be translated in the html file 6",
+        "translated": 0,
+        "deleted": 0
+    }
+}
