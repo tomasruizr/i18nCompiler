@@ -1,30 +1,38 @@
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
-var proxyquire = require('proxyquire');
+var proxyquire = require('proxyquire').noPreserveCache();
+var glob = require('globule');
 // var i18nCompiler = require('../../i18nCompiler');
 
 
 describe('i18nCompiler', function () {
 	var c;
+	var opts = {
+		languages:['es','en'],
+		separateFolders: false,
+		localesFolder: '..example/locales',
+		devLang: 'en'
+	};
 	describe('build', function () {
 		it('should write a file with an array of locales', function () {
 			var i18nCompiler = proxyquire('../../i18nCompiler', {
 				'fs-extra': {
-					readFileSync: function (name) {
-						return fs.readFileSync(path.resolve('test/example/locales/' + path.basename(name)), 'utf8');
-					},
+					'@global': false,
+					// readFileSync: function (name) {
+					// 	return fs.readFileSync(path.resolve('test/example/locales/' + path.basename(name)), 'utf8');
+					// },
 					writeFileSync: function (name, content) {
-						if (name === 'someFolder/en.js'){
-							expect(name).to.equal('someFolder/en.js');
-							var lang = JSON.parse(content.replace('var en = ', '').replace(';',''));
+						if (name === 'someFolder/locales/en.json'){
+							// var lang = JSON.parse(content.replace('var en = ', '').replace(';',''));
+							var lang = JSON.parse(content);
 							expect(lang[1]).to.equal('this is a subdir tomas');
 							expect(lang[2]).to.equal('this is a subdir tomas {NUM}');
 							expect(lang[3]).to.equal('this is a sentence to be translated in the html file 5');
 							expect(lang[4]).to.equal('this is a sentence to be translated in the html file 4');
 						}
-						if (name === 'someFolder/es.js'){
-							expect(name).to.equal('someFolder/es.js');
-							var lang = JSON.parse(content.replace('var es = ', '').replace(';',''));
+						if (name === 'someFolder/locales/es.json'){
+							// var lang = JSON.parse(content.replace('var es = ', '').replace(';',''));
+							var lang = JSON.parse(content);
 							expect(lang[1]).to.equal('este es un subdirectorio tomas');
 							expect(lang[2]).to.equal('este es un subdirectorio tomas {NUM}');
 							expect(lang[3]).to.equal('Esta es una frase traducida 5');
@@ -35,22 +43,16 @@ describe('i18nCompiler', function () {
 				}
 			});
 			c = new i18nCompiler();
-			c.build(['en.json', 'es.json'], 'someFolder', ['en', 'es'], { devLang: 'en' });
+			c.build('someFolder', opts);
 		});
 		it('should replace the strings in the destination folder for the array strings', function() {
-			var i18nCompiler = proxyquire('../../i18nCompiler', {
-				'fs-extra': {
-					readFileSync: function (name) {
-						if (path.extname(name, 'json')){
-							return fs.readFileSync(path.resolve('test/example/locales/' + path.basename(name)), 'utf8');
-						} else{
-							return fs.readFileSync(name, 'utf8');
-						}
-					}
-				}
-			});
+			fs.copySync('test/example/pruebaOrig', 'test/example/dist');
+			var i18nCompiler = require('../../i18nCompiler');
 			c = new i18nCompiler();
-			c.release(src, opts);
+			var files = glob.find('test/example/dist/**');
+			c.fetch(files, opts);
+			c.build('test/example/dist', opts);
+			c.compile(files, opts);	
 		});
 	});
 });

@@ -1,6 +1,6 @@
 {
     "Your {NUM} {NUM, plural, one{message} other{messages}} go here.": {
-        "translation": "Your {NUM} {NUM, plural, one{message} other{messages}} go here.",
+        "translation": "{NUM, plural, one{Tu} other{Tus}} {NUM} {NUM, plural, one{mensaje va} other{mensajes van}} aqui.",
         "translated": 0,
         "deleted": 0
     },
