@@ -209,8 +209,8 @@ i18nCompiler.prototype.separateFoldersRelease = function(fileName, locales, dest
  */
 i18nCompiler.prototype.compile = function(src, dest, language, opts) {
 	var self = this;
-	if (!dest && !language){
-		dest = opts;
+	if (!opts && !language && typeof dest === 'object'){
+		opts = dest;
 	}
 	var options = opts ? _.extend(this.options, opts) : this.options;
 	var i18n = new CompilerMessageFormat('en');
