@@ -1,19 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html ng-app='test'>
 <!-- <script type="text/javascript" src='http://code.jquery.com/jquery-2.1.1.min.js'></script> -->
-<script type="text/javascript" src='i18n.js'></script>
+<!-- <script type="text/javascript" src='i18n.js'></script> -->
+<script type="text/javascript" src='../bower_components/jquery/dist/jquery.min.js'></script>
+<script type="text/javascript" src='../bower_components/angular/angular.min.js'></script>
+<!-- <script type="text/javascript" src='locales/en.js'></script> -->
+<script type="text/javascript">
+(function(G) {
+	// G.i18n = lang_en.i18n;
+	// G._la = lang_en.dictionary;
+	angular.module('test', [])
+	.run(function(locales) {
+		locales.load_lang('es');
+		// locales.load_lang('en');
+		// $rootScope.i18n = i18n;
+		// $rootScope._la = _la;
+	})
+	.service('locales', ['$rootScope','$q', function ($rootScope, $q) {
+		var locales = this;
+		locales.currentLang = '';
+		locales.i18n;
+		locales._la;
+        locales.load_lang = function(lang) {
+        	$q(function(resolve) {
+	        	if (window['lang_' + lang]){
+	        		return resolve();
+	        	}
+	        	var script = 'locales/'+ lang +'.js';
+	            var s = document.createElement('script');
+			    s.type = 'text/javascript';
+			    s.async = true;
+			    s.src = script;
+			    s.onload = s.onreadystatechange = (function() {
+			   	 	resolve();
+			    });
+			    var x = document.getElementsByTagName('script')[0];
+			    x.parentNode.insertBefore(s, x);
+        	}).then(function() {
+        		locales.currentLang = lang;
+				i18n = $rootScope.i18n = locales.i18n = window['lang_' + lang].i18n;
+				_la = $rootScope._la = locales._la =  window['lang_' + lang].dictionary;
+			}, function() {
+				console.log('fail');
+			});
+        }; 
+    }])
+	.controller('ctrl', function($scope, $rootScope, locales) {
+		$scope.click = function() {
+			locales.load_lang(locales.currentLang === 'en' ? 'es': 'en');
+		};
+	});
+})(this);
+</script>
 <script type="text/javascript" src='test.js'></script>
 <script type="text/javascript" src='subdir/subDirTest.js'></script>
-<body>
-
-	<p><%__('this is a sentence to be translated in the html file 6')%></p>
-	<p><%__('this is a sentence to be translated in the html file 2')%></p>
-	<p><%__('this is a sentence to be translated in the html file 3')%></p>
-	<p><%__('this is a sentence to be translated in the html file 4')%></p>
-	<p><%__('this is a sentence to be translated in the html file 5')%></p>
-	<p><%__('this is a sentence to be translated in the html file 5')%></p>
-	<p><%__('this is a sentence to be translated in the html file 5')%></p>
-	<p><%__('this is a sentence to be translated in the html file 5')%></p>
+<body ng-controller="ctrl">
+	<a href ng-click="click()">Cambiar a es</a>
+	<p>{{_la[8]}}</p>
+	<p>{{_la[7]}}</p>
+	<p>{{_la[6]}}</p>
+	<p>{{_la[5]}}</p>
+	<p>{{_la[4]}}</p>
+	<p>{{_la[4]}}</p>
+	<p>{{_la[4]}}</p>
+	<p>{{_la[4]}}</p>
 
 </body>
 </html>

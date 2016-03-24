@@ -1,5 +1,5 @@
 (function(G){
 	var tomas = 3;
-	console.log(__('this is a subdir tomas {NUM}', {'NUM' : tomas}));	
-	console.log(__('this is a subdir tomas'));	
+	console.log(_la[3]({'NUM' : tomas}));	
+	console.log(_la[2]);	
 })(this);

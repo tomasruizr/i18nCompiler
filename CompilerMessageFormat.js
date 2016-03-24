@@ -24,44 +24,44 @@
  */
 
 (function ( root ) {
+  'use strict';
   //************************************************
   //Inheritance from Message Format
   //************************************************
   var MessageFormat = require('messageformat');
   function CompilerMessageFormat() {
     MessageFormat.apply(this, Array.prototype.slice.call(arguments));
-  };
+  }
   CompilerMessageFormat.prototype = new MessageFormat('en');
 
   //************************************************
   //Function override
   //************************************************
-  CompilerMessageFormat.prototype.functions = function (fewLimit, manyLimit) {
+  CompilerMessageFormat.prototype.functions = function (fewLimit, manyLimit, release) {
     fewLimit = fewLimit|| 10;
     manyLimit = manyLimit || 20;
-    var str = 
-'(function(G){\n'
-+'  G[\'i18n\']={\n'
-+'    lc:function(n){\n'
+    var str =release ? '{' : '(function(G){G[\'i18n\']={\n';
+    // var str = '(function(G){\n'
+   
+str+='    lc:function(n){\n'
 +'      var str;\n'
-+'        if (n===0)\n'
-+'          str = \'zero\';\n'
-+'        else if (n===1)\n'
-+'          str = \'one\';\n'
-+'        else if (n===2)\n'
-+'          str = \'two\';\n'
-+'        else if (n >= 3 && n <'+ fewLimit + ')\n'
-+'          str = \'few\';\n'
-+'        else if (n >= '+ fewLimit + ' && n < '+ manyLimit + ')\n'
-+'          str = \'many\';\n'
-+'        else\n'
-+'          str = \'other\';\n'
-+'        return str;\n'
-+'      },\n'
++'      if (n===0)\n'
++'        str = \'zero\';\n'
++'      else if (n===1)\n'
++'        str = \'one\';\n'
++'      else if (n===2)\n'
++'        str = \'two\';\n'
++'      else if (n >= 3 && n <'+ fewLimit + ')\n'
++'        str = \'few\';\n'
++'      else if (n >= '+ fewLimit + ' && n < '+ manyLimit + ')\n'
++'        str = \'many\';\n'
++'      else\n'
++'        str = \'other\';\n'
++'      return str;\n'
++'    },\n'
 +'    c:function(data, varName){\n'
 +'      if(!data) throw new Error("MessageFormat: Data required for \'"+varName+"\'.")\n'
 +'    },\n'
-+'\n'
 +'    n:function(data, varName, offset){\n'
 +'      if(isNaN(data[varName]))throw new Error("MessageFormat: \'"+varName+"\' isn\'t a number.");\n'
 +'      return data[varName] - (offset||0)\n'
@@ -81,9 +81,8 @@
 +'    \n'
 +'    }\n'
 +'  }\n'
-+'\n'
-+'}\n'
-+')(this);';
++'}\n';
+str += release ? "" : ')(this);';
     
     return str;
   };
