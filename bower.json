@@ -1,0 +1,30 @@
+{
+  "name": "i18nCompiler",
+  "description": "Compiles localization strings in a project and generates sets of js/html per each language supported in the app. Supports client side as well. Based in SlexAxton/messageformat.js",
+  "main": "i18nWeb.js",
+  "authors": [
+    "Tomas Ruiz <tomasruizr@gmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "localization",
+    "i18n",
+    "i10n",
+    "translation",
+    "translate",
+    "gulp",
+    "grunt",
+    "messageformat"
+  ],
+  "homepage": "https://github.com/tomasruizr/i18nCompiler",
+  "moduleType": [
+    "globals"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
