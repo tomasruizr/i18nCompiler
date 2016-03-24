@@ -306,7 +306,7 @@ i18nCompiler.prototype.compile = function(src, dest, language, opts) {
 		} else {
 			fileJsLocale+= 'G["lang_'+key+'"].i18n=' + i18n.functions(options.defaultPlurals.fewLimit, options.defaultPlurals.manyLimit, true);
 		}
-		fileJsLocale+=')(this);';
+		fileJsLocale+='})(this);';
 		fs.writeFileSync(path.join(options.srcFolder, 'locales', key + '.js'), fileJsLocale);
 	});
 	console.log('Process Complete!!.');

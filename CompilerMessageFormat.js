@@ -24,10 +24,12 @@
  */
 
 (function ( root ) {
+
   'use strict';
   //************************************************
   //Inheritance from Message Format
   //************************************************
+  var UglifyJS = require('uglify-js');
   var MessageFormat = require('messageformat');
   function CompilerMessageFormat() {
     MessageFormat.apply(this, Array.prototype.slice.call(arguments));
@@ -80,10 +82,16 @@ str+='    lc:function(n){\n'
 +'      return data[varName] in plurals ? plurals[data[varName]] : plurals.other\n'
 +'    \n'
 +'    }\n'
-+'  }\n'
+// +'  }\n'
 +'}\n';
-str += release ? "" : ')(this);';
-    
+str += release ? "" : '})(this);';
+    // ugly work around to minify the object notation;
+    if (release){
+      str = 'var object_notation=' + str;
+      str = UglifyJS.minify(str, {fromString: true}).code.replace('var object_notation=', "");
+    } else {
+      str = UglifyJS.minify(str, {fromString: true}).code;
+    }
     return str;
   };
   

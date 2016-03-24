@@ -37,6 +37,7 @@
     "fs-extra": "^0.26.7",
     "globule": "^0.2.0",
     "lodash": "^4.6.1",
-    "messageformat": "^0.2.0"
+    "messageformat": "^0.2.0",
+    "uglify-js": "^2.6.2"
   }
 }
