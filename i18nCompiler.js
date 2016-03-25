@@ -218,7 +218,7 @@ i18nCompiler.prototype.compile = function(src, dest, language, opts) {
 	var localesFolderDir = [];
 	var locales = {};
 	var replacesCount = 0;
-	var fileStat, count, fileStr, strArray;	
+	var fileStat, fileStr, strArray;	
 	var arrays = {};
 	var lang;
 	options.srcFolder = src[0];
@@ -264,10 +264,13 @@ i18nCompiler.prototype.compile = function(src, dest, language, opts) {
 		for (var strArrayCont = strArray.length - 1; strArrayCont >= 0; strArrayCont--) {
 			//Local Array
 			var rawLocaleArr = strArray[strArrayCont];
+			console.log(rawLocaleArr[0]);
 			//key to search in the json file.
 			var localeStr = self.purifyLocal(rawLocaleArr[1]);
+			console.log(localeStr);
 			//Data of the sentence if it exists
 			var localeData = self.purifyData(rawLocaleArr[1]);
+			console.log(localeData);
 			// replacesCount += self.spaRelease(src[srcCount], localStr, localeData, locales);
 			// _.each(locales, function(local) {
 			// });
@@ -466,6 +469,8 @@ i18nCompiler.prototype.fetch = function (src, opts) {
 				continue;
 			}
 			fileStr = fs.readFileSync(fileName, 'utf8');
+			//Workaround for the \' characters
+ 			fileStr = fileStr.replace(/\\\'/g, '"');
 			//get the locals in each files
 			var strArray = this.getI18nStrings(path.extname(fileName), fileStr, options);
 			for (var strArrayCont = strArray.length - 1; strArrayCont >= 0; strArrayCont--) {
@@ -557,7 +562,7 @@ i18nCompiler.prototype.purifyLocal = function (rawLocal) {
 i18nCompiler.prototype.purifyData = function (rawLocal) {
 	// var locales = [];
 	//(?!['|\"]).*'\s*,\s*(.*)
-	var reStr = '(?![\'|\\"]).*\'\\s*,\\s*(.*)';
+	var reStr = /,[\s]*({[\s\S]+)/gm; 
 	var result = this.searchRegExp(reStr, rawLocal);
 
 	if (result[0]) {
@@ -578,7 +583,7 @@ i18nCompiler.prototype.purifyData = function (rawLocal) {
  * @return {[type]}           [description]
  */
 i18nCompiler.prototype.searchRegExp = function (reStr, str) {
-	var re = new RegExp(reStr, 'g');
+	var re = reStr.constructor === RegExp ? reStr : new RegExp(reStr, 'g');
 	var regex = [];
 	var result = [];
 	do {

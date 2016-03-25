@@ -60,29 +60,34 @@ describe('i18nCompiler', function () {
 		});
 	});
 	describe('getI18nStrings', function () {
-		it('should capture the strings for localization in a js file if the function is inside a string', function() {
-			// var str = "'vaScript.</p> <p>{{__(\'Hola Pana mio que tal {N}\', {\'N\':4})}}</p> </div>'";
-			// var str = fs.readFileSync('test/mocks/main.js', 'utf8');
-			var str = fs.readFileSync('test/mocks/simple.js', 'utf8');
-			str = str.replace(/\\\'/g, '"');
-			c = new i18nCompiler();
-			var res = c.getI18nStrings('.js', str, {
-				openLocalizationTag : '{{',
-				localizationFunction : '__',
-				closeLocalizationTag : '}}'
-			});
-			for (var strArrayCont = res.length - 1; strArrayCont >= 0; strArrayCont--) {
-			//Local Array
-				var rawLocaleArr = res[strArrayCont];
-				// console.log('The rawLocaleArr', rawLocaleArr);
-			//key to search in the json file.
-				var localeStr = c.purifyLocal(rawLocaleArr[1]);
-				console.log('The localeStr', localeStr);
-			//Data of the sentence if it exists
-				var localeData = c.purifyData(rawLocaleArr[1]);
-				console.log('The localeData', localeData);
-			}
-			// console.log(res);
-		});
+		// it('should capture the strings for localization in a js file if the function is inside a string', function() {
+		// 	// var str = "'vaScript.</p> <p>{{__(\'Hola Pana mio que tal {N}\', {\'N\':4})}}</p> </div>'";
+		// 	// var str = fs.readFileSync('test/mocks/main.js', 'utf8');
+		// 	fs.removeSync('test/example/dist');
+		// 	fs.copySync('test/example/pruebaOrig', 'test/example/dist');
+			
+		// 	c = new i18nCompiler();
+		// 	var files = glob.find('test/example/dist/**');
+		// 	c.fetch(files, opts);
+		// 	var str = fs.readFileSync('test/mocks/simple.js', 'utf8');
+		// 	str = str.replace(/\\\'/g, '"');
+		// 	var res = c.getI18nStrings('.js', str, {
+		// 		openLocalizationTag : '{{',
+		// 		localizationFunction : '__',
+		// 		closeLocalizationTag : '}}'
+		// 	});
+		// 	for (var strArrayCont = res.length - 1; strArrayCont >= 0; strArrayCont--) {
+		// 	//Local Array
+		// 		var rawLocaleArr = res[strArrayCont];
+		// 		// console.log('The rawLocaleArr', rawLocaleArr);
+		// 	//key to search in the json file.
+		// 		var localeStr = c.purifyLocal(rawLocaleArr[1]);
+		// 		console.log('The localeStr', localeStr);
+		// 	//Data of the sentence if it exists
+		// 		var localeData = c.purifyData(rawLocaleArr[1]);
+		// 		console.log('The localeData', localeData);
+		// 	}
+		// 	// console.log(res);
+		// });
 	});
 });
