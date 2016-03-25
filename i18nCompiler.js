@@ -256,6 +256,8 @@ i18nCompiler.prototype.compile = function(src, dest, language, opts) {
 		replacesCount = 0;
 		//array of locales in the developed language.
 		fileStr = fs.readFileSync(src[srcCount], 'utf8');
+		//Workaround for the \' characters
+ 		fileStr = fileStr.replace(/\\\'/g, '"');
 		//get the locals in each files
 		strArray = this.getI18nStrings(path.extname(src[srcCount]), fileStr, options);
 		//For each local in the source.

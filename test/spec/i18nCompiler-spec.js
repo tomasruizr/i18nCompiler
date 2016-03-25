@@ -1,8 +1,9 @@
+'use strict';
 var fs = require('fs-extra');
-var path = require('path');
-var proxyquire = require('proxyquire').noPreserveCache();
+// var path = require('path');
+// var proxyquire = require('proxyquire').noPreserveCache();
 var glob = require('globule');
-// var i18nCompiler = require('../../i18nCompiler');
+var i18nCompiler = require('../../i18nCompiler');
 
 
 describe('i18nCompiler', function () {
@@ -10,7 +11,7 @@ describe('i18nCompiler', function () {
 	var opts = {
 		languages:['es','en'],
 		separateFolders: false,
-		localesFolder: '..example/locales',
+		localesFolder: '../example/locales',
 		devLang: 'en'
 	};
 	describe('build', function () {
@@ -45,15 +46,43 @@ describe('i18nCompiler', function () {
 		// 	c = new i18nCompiler();
 		// 	c.build('someFolder', opts);
 		// });
+	});
+	describe('compile', function () {
 		it('should replace the strings in the destination folder for the array strings', function() {
 			fs.removeSync('test/example/dist');
 			fs.copySync('test/example/pruebaOrig', 'test/example/dist');
-			var i18nCompiler = require('../../i18nCompiler');
+			
 			c = new i18nCompiler();
 			var files = glob.find('test/example/dist/**');
 			c.fetch(files, opts);
 			// c.build('test/example/dist', opts);
 			c.compile(files, opts);	
+		});
+	});
+	describe('getI18nStrings', function () {
+		it('should capture the strings for localization in a js file if the function is inside a string', function() {
+			// var str = "'vaScript.</p> <p>{{__(\'Hola Pana mio que tal {N}\', {\'N\':4})}}</p> </div>'";
+			// var str = fs.readFileSync('test/mocks/main.js', 'utf8');
+			var str = fs.readFileSync('test/mocks/simple.js', 'utf8');
+			str = str.replace(/\\\'/g, '"');
+			c = new i18nCompiler();
+			var res = c.getI18nStrings('.js', str, {
+				openLocalizationTag : '{{',
+				localizationFunction : '__',
+				closeLocalizationTag : '}}'
+			});
+			for (var strArrayCont = res.length - 1; strArrayCont >= 0; strArrayCont--) {
+			//Local Array
+				var rawLocaleArr = res[strArrayCont];
+				// console.log('The rawLocaleArr', rawLocaleArr);
+			//key to search in the json file.
+				var localeStr = c.purifyLocal(rawLocaleArr[1]);
+				console.log('The localeStr', localeStr);
+			//Data of the sentence if it exists
+				var localeData = c.purifyData(rawLocaleArr[1]);
+				console.log('The localeData', localeData);
+			}
+			// console.log(res);
 		});
 	});
 });
